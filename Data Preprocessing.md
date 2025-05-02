@@ -184,3 +184,207 @@ python splitting_image.py
 ## 🧩 Note
 
 These steps help ensure uniformity, reduce image loading time, and improve training efficiency.
+
+
+# FInish.
+
+# Additional Codes to handle HEIC:
+# Image Compression Script (with HEIC Support)
+
+This Python script compresses `.jpg`, `.jpeg`, `.png`, and `.heic` image files in a folder called `images` and saves the compressed `.jpg` versions in a `compressed` folder — all relative to the script's location.
+
+---
+
+## 📌 Features
+
+- ✅ Supports **HEIC**, **JPG**, **JPEG**, and **PNG** formats.
+- ✅ Converts all images to **optimized `.jpg`** files.
+- ✅ Keeps everything **path-independent** — no configuration required.
+- ✅ Works directly from the **command line**.
+- ✅ Uses `pillow-heif` to handle HEIC files.
+
+---
+
+## 📂 Folder Structure
+
+```
+your-folder/
+├── compress_images.py
+├── images/
+│   ├── photo1.jpg
+│   ├── photo2.heic
+│   └── ...
+├── compressed/
+```
+
+---
+
+## ⚙️ Requirements
+
+Make sure Python and pip are installed, then run:
+
+```bash
+pip install pillow pillow-heif
+```
+
+---
+
+## 🚀 How to Use
+
+1. Place your images in the `images/` folder (create it if it doesn't exist).
+
+2. Run the script using Python:
+   ```bash
+   python compress_images.py
+   ```
+
+3. Compressed `.jpg` files will appear in the `compressed/` folder.
+
+---
+
+## 🧠 The Script
+
+```python
+import os
+from PIL import Image, ImageOps
+from pillow_heif import register_heif_opener
+
+# Enable HEIC format support
+register_heif_opener()
+
+# Get current script directory
+base_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Set relative input and output folders
+input_folder = os.path.join(base_dir, "images")
+output_folder = os.path.join(base_dir, "compressed")
+
+# Set compression quality (lower = smaller size, 70 is a good default)
+quality = 70
+
+# Create output folder if it doesn't exist
+os.makedirs(output_folder, exist_ok=True)
+
+print(f"🔍 Scanning: {input_folder}")
+print(f"💾 Saving compressed images to: {output_folder}\n")
+
+# Walk through images
+for filename in os.listdir(input_folder):
+    if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.heic')):
+        input_path = os.path.join(input_folder, filename)
+        output_filename = os.path.splitext(filename)[0] + ".jpg"
+        output_path = os.path.join(output_folder, output_filename)
+
+        try:
+            with Image.open(input_path) as img:
+                img = ImageOps.exif_transpose(img)
+                img = img.convert("RGB")
+                img.save(output_path, format='JPEG', optimize=True, quality=quality)
+            print(f"✅ Compressed: {filename} → {output_filename}")
+        except Exception as e:
+            print(f"⚠️ Error processing {filename}: {e}")
+
+print("\n🎉 Done! All images have been compressed.")
+```
+
+---
+
+
+
+
+
+# HEIC to JPG Converter (No Quality Loss)
+
+This script converts `.heic` images to `.jpg` format while preserving maximum quality. It uses `pillow-heif` for HEIC support and `Pillow` for image processing.
+
+---
+
+## 📌 Features
+
+- ✅ Converts `.heic` files to `.jpg` with **no visible quality loss**
+- ✅ Automatically scans the `heic_images/` folder
+- ✅ Saves `.jpg` files to a `jpg_images/` folder
+- ✅ No hardcoded paths — portable and easy to run
+- ✅ Command-line friendly
+
+---
+
+## 📂 Folder Structure
+
+```
+your-folder/
+├── convert_heic_to_jpg.py
+├── heic_images/
+│   ├── photo1.heic
+│   └── ...
+├── jpg_images/
+```
+
+- Put your `.heic` files in the `heic_images/` folder
+- Converted `.jpg` files will appear in the `jpg_images/` folder
+
+---
+
+## ⚙️ Requirements
+
+Install the required libraries using pip:
+
+```bash
+pip install pillow pillow-heif
+```
+
+---
+
+## 🚀 How to Use
+
+1. Place `.heic` images in the `heic_images/` folder
+2. Run the script:
+
+```bash
+python convert_heic_to_jpg.py
+```
+
+3. Check the `jpg_images/` folder for the converted `.jpg` files
+
+---
+
+## 🧠 The Script
+
+```python
+import os
+from PIL import Image
+from pillow_heif import register_heif_opener
+
+# Register HEIC support
+register_heif_opener()
+
+# Set the input and output folders
+input_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "heic_images")
+output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "jpg_images")
+
+# Create output folder if it doesn't exist
+os.makedirs(output_folder, exist_ok=True)
+
+print(f"🔍 Converting HEIC images in: {input_folder}")
+print(f"💾 Converted JPGs will be saved in: {output_folder}\n")
+
+# Process each HEIC file
+for filename in os.listdir(input_folder):
+    if filename.lower().endswith('.heic'):
+        input_path = os.path.join(input_folder, filename)
+        output_filename = os.path.splitext(filename)[0] + ".jpg"
+        output_path = os.path.join(output_folder, output_filename)
+
+        try:
+            with Image.open(input_path) as img:
+                img = img.convert("RGB")  # Ensure it's compatible with JPEG
+                img.save(output_path, format="JPEG", quality=100)  # No quality loss
+            print(f"✅ Converted: {filename} → {output_filename}")
+        except Exception as e:
+            print(f"⚠️ Failed to convert {filename}: {e}")
+
+print("\n🎉 Done! All HEIC images converted to high-quality JPG.")
+```
+
+---
+
