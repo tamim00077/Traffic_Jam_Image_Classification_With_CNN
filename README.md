@@ -87,20 +87,18 @@ The images are processed using Keras' `ImageDataGenerator` to:
 ```python
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-# Define paths
+# Define paths (after mounting)
 base_dir = "/content/drive/MyDrive/Traffic_Dataset"
 train_dir = f"{base_dir}/train"
 test_dir = f"{base_dir}/test"
 
-# Image preprocessing parameters
+# Image preprocessing
 img_size = (128, 128)
 batch_size = 32
 
-# Create image generators
 train_gen = ImageDataGenerator(rescale=1./255)
 test_gen = ImageDataGenerator(rescale=1./255)
 
-# Set up data generators
 train_generator = train_gen.flow_from_directory(
     train_dir,
     target_size=img_size,
@@ -127,22 +125,23 @@ The CNN model consists of:
 - Output layer with sigmoid activation for binary classification
 
 ```python
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+
 model = Sequential([
     Conv2D(32, (3,3), activation='relu', input_shape=(128,128,3)),
     MaxPooling2D(2,2),
-    
+
     Conv2D(64, (3,3), activation='relu'),
     MaxPooling2D(2,2),
-    
+
     Flatten(),
     Dense(128, activation='relu'),
     Dropout(0.5),
     Dense(1, activation='sigmoid')  # Binary classification
 ])
 
-model.compile(optimizer='adam', 
-              loss='binary_crossentropy', 
-              metrics=['accuracy'])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 ```
 
 The architecture breakdown:
@@ -160,17 +159,14 @@ The architecture breakdown:
 The model was trained for 30 epochs using the Adam optimizer and binary cross-entropy loss function:
 
 ```python
-model.fit(
-    train_generator,
-    validation_data=test_generator,
-    epochs=30
-)
+model.fit(train_generator, validation_data=test_generator, epochs=30)
 ```
 
 After training, the model was saved to disk:
 
 ```python
 model.save("/content/drive/MyDrive/traffic_jam_classifier.keras")
+print("✅ Model saved as traffic_jam_classifier.keras")
 ```
 
 ### Model Evaluation
@@ -182,6 +178,38 @@ The model's performance was evaluated on the test dataset, and predictions were 
 Example predictions on random test images:
 
 ```python
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing import image
+import numpy as np
+import matplotlib.pyplot as plt
+
+# ✅ Load the model
+model = load_model("/content/drive/MyDrive/traffic_jam_classifier.keras")
+
+# ✅ Path to the test image (update the path if needed)
+img_path = "/content/drive/MyDrive/Traffic_Dataset/test/NOT_JAM/not_jam140.JPG"
+
+# ✅ Load and preprocess the image
+img = image.load_img(img_path, target_size=(128, 128))
+img_array = image.img_to_array(img)
+img_array = np.expand_dims(img_array, axis=0) / 255.0
+
+# ✅ Make prediction
+prediction = model.predict(img_array)[0][0]
+predicted_label = "NOT_JAM" if prediction > 0.5 else "JAM"
+
+# ✅ Show the image with predicted label and confidence
+plt.imshow(img)
+plt.title(f"Predicted: {predicted_label}\nConfidence: {prediction:.2f}")
+plt.axis('off')
+plt.show()
+```
+
+## Using the Model
+
+To use the trained model for prediction on new images:
+
+```python
 import os
 import random
 import numpy as np
@@ -189,14 +217,14 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 
-# Load the trained model
+# ✅ Load the trained model
 model = load_model("/content/drive/MyDrive/traffic_jam_classifier.keras")
 
-# Paths to test directories
+# ✅ Paths to test directories
 test_base = "/content/drive/MyDrive/Traffic_Dataset/test"
 categories = ["JAM", "NOT_JAM"]
 
-# Function to load, preprocess, and predict a single image
+# ✅ Function to load, preprocess, and predict a single image
 def predict_random_image_from_category(category):
     folder_path = os.path.join(test_base, category)
     img_name = random.choice(os.listdir(folder_path))
@@ -211,7 +239,7 @@ def predict_random_image_from_category(category):
 
     return img, img_path, predicted_label, prediction
 
-# Plot predictions for one image from each class
+# ✅ Plot predictions for one image from each class
 plt.figure(figsize=(12, 6))
 
 for i, category in enumerate(categories):
@@ -223,35 +251,6 @@ for i, category in enumerate(categories):
 
 plt.tight_layout()
 plt.show()
-```
-
-## Using the Model
-
-To use the trained model for prediction on new images:
-
-```python
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Load the model
-model = load_model("traffic_jam_classifier.keras")
-
-# Path to the image you want to classify
-img_path = "path_to_your_image.jpg"
-
-# Load and preprocess the image
-img = image.load_img(img_path, target_size=(128, 128))
-img_array = image.img_to_array(img)
-img_array = np.expand_dims(img_array, axis=0) / 255.0
-
-# Make prediction
-prediction = model.predict(img_array)[0][0]
-predicted_label = "NOT_JAM" if prediction > 0.5 else "JAM"
-
-# Display result
-print(f"Predicted: {predicted_label} with confidence: {prediction:.2f}")
 ```
 
 ## Future Improvements
