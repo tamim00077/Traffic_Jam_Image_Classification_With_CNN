@@ -162,3 +162,6 @@ if __name__ == '__main__':
 
 ## ✅ You're all set!
 You can now use the trained CNN model in a user-friendly local web interface to classify traffic images.
+
+## DRIVE LINK:
+https://drive.google.com/drive/folders/1DenMmoy0L9OhgY0rncl8tZ5NUw9IcfWl?usp=drive_link
