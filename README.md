@@ -1,88 +1,29 @@
-# Traffic Jam Classification using CNN
 
-This project demonstrates how to build and train a Convolutional Neural Network (CNN) to classify traffic images into two categories: "JAM" and "NOT_JAM". The model helps to automatically identify traffic congestion from images.
+# 🚦 Traffic Jam Classification using CNN
 
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Dataset Description](#dataset-description)
-- [Environment Setup](#environment-setup)
-- [Project Structure](#project-structure)
-- [Implementation Details](#implementation-details)
-  - [Data Preprocessing](#data-preprocessing)
-  - [Model Architecture](#model-architecture)
-  - [Training Process](#training-process)
-  - [Model Evaluation](#model-evaluation)
-- [Results and Visualization](#results-and-visualization)
-- [Using the Model](#using-the-model)
-- [Future Improvements](#future-improvements)
+This project uses a Convolutional Neural Network (CNN) to classify traffic images into two categories: `JAM` and `NOT_JAM`. The model is trained using TensorFlow and Keras in Google Colab. The dataset is stored in Google Drive and consists of images divided into training and testing sets.
 
-## Project Overview
+---
 
-Traffic congestion detection is crucial for modern traffic management systems. This project uses deep learning to automate the classification of traffic images, determining whether they show congested (JAM) or free-flowing (NOT_JAM) traffic conditions.
+## 📁 Dataset Structure
 
-The implementation uses TensorFlow and Keras to build a CNN model, which is trained on a dataset of labeled traffic images.
-
-## Dataset Description
-
-The dataset consists of traffic images organized as follows:
+The dataset should be organized as follows:
 
 ```
 Traffic_Dataset/
-├── train/
+│
+├── train/             # 80% of data
 │   ├── JAM/
 │   └── NOT_JAM/
-└── test/
+│
+└── test/              # 20% of data
     ├── JAM/
     └── NOT_JAM/
 ```
 
-- **Training set (80%)**: Used to train the model
-- **Testing set (20%)**: Used to evaluate model performance
+---
 
-Each image is categorized into one of two classes:
-- **JAM**: Images showing congested traffic
-- **NOT_JAM**: Images showing free-flowing traffic
-
-## Environment Setup
-
-This project was implemented in Google Colab with the following dependencies:
-
-```python
-import tensorflow as tf
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
-from tensorflow.keras.preprocessing import image
-import numpy as np
-import matplotlib.pyplot as plt
-import os
-import random
-```
-
-## Project Structure
-
-```
-project/
-├── Traffic_Dataset/         # Dataset directory
-│   ├── train/
-│   │   ├── JAM/             # Training images of traffic jams
-│   │   └── NOT_JAM/         # Training images of normal traffic
-│   └── test/
-│       ├── JAM/             # Testing images of traffic jams
-│       └── NOT_JAM/         # Testing images of normal traffic
-├── traffic_jam_classifier.keras  # Saved model
-└── notebooks/
-    └── traffic_jam_classification.ipynb  # Main implementation notebook
-```
-
-## Implementation Details
-
-### Data Preprocessing
-
-The images are processed using Keras' `ImageDataGenerator` to:
-1. Rescale pixel values from [0-255] to [0-1]
-2. Resize all images to 128×128 pixels
-3. Load images in batches of 32
+## ✅ Step 1: Data Preparation
 
 ```python
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -114,15 +55,9 @@ test_generator = test_gen.flow_from_directory(
 )
 ```
 
-Note: For more robust models, you could add data augmentation techniques like rotation, width/height shifts, zooming, etc.
+---
 
-### Model Architecture
-
-The CNN model consists of:
-- 2 convolutional layers with max-pooling
-- Flattening layer to convert 2D feature maps to 1D features
-- Dense hidden layer with dropout for regularization
-- Output layer with sigmoid activation for binary classification
+## ✅ Step 2: CNN Model Creation
 
 ```python
 from tensorflow.keras.models import Sequential
@@ -144,38 +79,26 @@ model = Sequential([
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 ```
 
-The architecture breakdown:
-1. First Conv2D layer: 32 filters, 3×3 kernel, ReLU activation
-2. First MaxPooling: 2×2 pooling to reduce spatial dimensions
-3. Second Conv2D layer: 64 filters, 3×3 kernel, ReLU activation
-4. Second MaxPooling: 2×2 pooling
-5. Flatten: Convert 3D feature maps to 1D feature vector
-6. Dense layer: 128 neurons with ReLU activation
-7. Dropout: 50% dropout rate to prevent overfitting
-8. Output: Single neuron with sigmoid activation (0 = JAM, 1 = NOT_JAM)
+---
 
-### Training Process
-
-The model was trained for 30 epochs using the Adam optimizer and binary cross-entropy loss function:
+## ✅ Step 3: Model Training
 
 ```python
 model.fit(train_generator, validation_data=test_generator, epochs=30)
 ```
 
-After training, the model was saved to disk:
+---
+
+## ✅ Step 4: Save the Model
 
 ```python
 model.save("/content/drive/MyDrive/traffic_jam_classifier.keras")
 print("✅ Model saved as traffic_jam_classifier.keras")
 ```
 
-### Model Evaluation
+---
 
-The model's performance was evaluated on the test dataset, and predictions were visualized to qualitatively assess performance.
-
-## Results and Visualization
-
-Example predictions on random test images:
+## ✅ Step 5: Test on a Single Image
 
 ```python
 from tensorflow.keras.models import load_model
@@ -205,9 +128,9 @@ plt.axis('off')
 plt.show()
 ```
 
-## Using the Model
+---
 
-To use the trained model for prediction on new images:
+## ✅ Step 6: Predict Random Images from Each Class
 
 ```python
 import os
@@ -253,16 +176,19 @@ plt.tight_layout()
 plt.show()
 ```
 
-## Future Improvements
+---
 
-Several enhancements could be made to improve the model:
+## 📊 Results
 
-1. **Data Augmentation**: Implement techniques like rotation, zoom, flip, etc., to increase dataset diversity
-2. **Model Architecture**: Experiment with deeper architectures or pre-trained models (e.g., VGG16, ResNet)
-3. **Hyperparameter Tuning**: Optimize learning rate, batch size, etc.
-4. **Class Imbalance**: Address any imbalance in the dataset
-5. **Explainability**: Add visualization techniques (e.g., Grad-CAM) to highlight areas the model focuses on
+- The CNN model classifies traffic images with a binary output: **JAM** or **NOT_JAM**.
+- It is trained and tested on a dataset split 80/20.
+- Final model is saved as `.keras` and used for future predictions.
 
-## License
+---
 
-[J.M. Tamimur Rahman]
+## 🚀 Future Improvements
+
+- Add real-time video or webcam support.
+- Apply data augmentation to reduce overfitting.
+- Try using transfer learning (e.g., MobileNet, ResNet).
+- Deploy the model using a web interface (Flask or Streamlit).
